@@ -2,10 +2,12 @@ package com.example.smartdoc.Controller;
 
 
 import com.example.smartdoc.Service.DocService;
+import com.example.smartdoc.Utils.UploadResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
     @RestController
     @RequestMapping("/api")
@@ -18,16 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
         }
 
         @PostMapping("/upload")
-        public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+        public ResponseEntity<UploadResponse> uploadDoc(@RequestParam("file") MultipartFile file) {
             String fileName = file.getOriginalFilename();
             storageService.uploadFile(file, fileName);
-            return new ResponseEntity<>("File uploaded successfully", HttpStatus.OK);
+            UploadResponse response = new UploadResponse("File uploaded successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
-        @GetMapping("/hello")
-        public  ResponseEntity<String> hello() {
-            return new ResponseEntity<>("Hello", HttpStatus.OK);
-        }
 
 
     }
