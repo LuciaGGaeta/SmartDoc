@@ -4,7 +4,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import org.springframework.context.annotation.Bean;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -15,6 +15,9 @@ public class DocService {
     private final String bucketName = System.getenv("MY_BUCKET_NAME");
 
     public boolean uploadFile(MultipartFile file, String fileName) {
+        UUID fileId = UUID.randomUUID();
+        String name = fileName.replace(".pdf", "");
+        fileName =  name + "_" + fileId.toString() + ".pdf";
         try {
             BlobId blobId = BlobId.of(bucketName, fileName);
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
