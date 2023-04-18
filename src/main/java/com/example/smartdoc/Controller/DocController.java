@@ -4,11 +4,13 @@ package com.example.smartdoc.Controller;
 import com.example.smartdoc.Service.DocService;
 import com.example.smartdoc.Utils.Folder;
 import com.example.smartdoc.Utils.UploadResponse;
+import com.google.cloud.storage.Blob;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,7 +52,7 @@ import java.util.concurrent.ExecutionException;
 
     @PostMapping("/downloadFile")
     public void getFile(@RequestBody String fileName) {
-        storageService.downloadObject(fileName);
+            storageService.downloadObject(fileName);
     }
 
 
