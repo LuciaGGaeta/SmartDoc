@@ -90,18 +90,11 @@ public class DocService {
 
     public void downloadObject(String objectName) {
         Storage storage = StorageOptions.newBuilder().setProjectId(projectId).build().getService();
-        String destination = "./downloads/"+objectName;
+        String destination = ".\\downloads\\" + objectName;
         Blob blob = storage.get(BlobId.of(bucketName, objectName));
         if(blob != null){
-            blob.downloadTo(Paths.get(objectName));
+            blob.downloadTo(Paths.get(destination));
         }
-        System.out.println(
-                "Downloaded object "
-                        + objectName
-                        + " from bucket name "
-                        + bucketName
-                        + " to "
-                        + objectName);
     }
 }
 
