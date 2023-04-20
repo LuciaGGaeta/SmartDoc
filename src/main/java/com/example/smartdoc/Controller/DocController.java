@@ -52,33 +52,21 @@ import java.util.concurrent.ExecutionException;
             return folder;
         }
 
-    @PostMapping("/downloadFile")
-    public ResponseEntity<Blob> getFile(@RequestBody String fileName) {
+        @GetMapping("/downloadBlob")
+        public void downloadBlob(HttpServletResponse response, @RequestParam String fileName) throws IOException {
+            // Leggi il blob dal servizio di archiviazione
             Blob blob = storageService.downloadObject(fileName);
-            System.out.println("BLOB"+blob);
-            return new ResponseEntity<>(blob, HttpStatus.OK);
-    }
 
-    @GetMapping("/downloadBlob")
-    public void downloadBlob(HttpServletResponse response, @RequestParam String fileName) throws IOException {
-        // Leggi il blob dal servizio di archiviazione
-        Blob blob = storageService.downloadObject(fileName);
+            // Imposta il tipo di contenuto del blob nell'intestazione HTTP
+            response.setContentType(blob.getContentType());
 
-        // Imposta il tipo di contenuto del blob nell'intestazione HTTP
-        response.setContentType(blob.getContentType());
+            // Imposta la dimensione del contenuto del blob nell'intestazione HTTP
+            response.setContentLength(Math.toIntExact(blob.getSize()));
 
-        // Imposta la dimensione del contenuto del blob nell'intestazione HTTP
-        response.setContentLength(Math.toIntExact(blob.getSize()));
-
-        // Copia il flusso di dati del blob nel corpo della risposta HTTP
-        blob.downloadTo(response.getOutputStream());
-        response.flushBuffer();
-    }
-
-
-
-
-
+            // Copia il flusso di dati del blob nel corpo della risposta HTTP
+            blob.downloadTo(response.getOutputStream());
+            response.flushBuffer();
+        }
 }
 
 
