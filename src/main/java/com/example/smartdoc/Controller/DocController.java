@@ -5,6 +5,8 @@ import com.example.smartdoc.Service.DocService;
 import com.example.smartdoc.Utils.Folder;
 import com.example.smartdoc.Utils.UploadResponse;
 import com.google.cloud.storage.Blob;
+import io.opencensus.resource.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,9 +53,28 @@ import java.util.concurrent.ExecutionException;
         }
 
     @PostMapping("/downloadFile")
-    public void getFile(@RequestBody String fileName) {
-            storageService.downloadObject(fileName);
+    public ResponseEntity<Blob> getFile(@RequestBody String fileName) {
+            Blob blob = storageService.downloadObject(fileName);
+            System.out.println("BLOB"+blob);
+            return new ResponseEntity<>(blob, HttpStatus.OK);
     }
+
+    @GetMapping("/downloadBlob")
+    public void downloadBlob(HttpServletResponse response, @RequestParam String fileName) throws IOException {
+        // Leggi il blob dal servizio di archiviazione
+        Blob blob = storageService.downloadObject(fileName);
+
+        // Imposta il tipo di contenuto del blob nell'intestazione HTTP
+        response.setContentType(blob.getContentType());
+
+        // Imposta la dimensione del contenuto del blob nell'intestazione HTTP
+        response.setContentLength(Math.toIntExact(blob.getSize()));
+
+        // Copia il flusso di dati del blob nel corpo della risposta HTTP
+        blob.downloadTo(response.getOutputStream());
+        response.flushBuffer();
+    }
+
 
 
 

@@ -88,31 +88,10 @@ public class DocService {
         return folder;
     }
 
-    public void downloadObject(String objectName) {
+    public Blob downloadObject(String objectName) {
         Storage storage = StorageOptions.newBuilder().setProjectId(projectId).build().getService();
-        String destination = ".\\downloads\\" + objectName;
         Blob blob = storage.get(BlobId.of(bucketName, objectName));
-        if (blob != null) {
-            blob.downloadTo(Paths.get(destination));
-        } else {
-            int maxAttempts = 3; // Numero massimo di tentativi di download
-            int currentAttempt = 0; // Numero di tentativi effettuati finora
-            while (currentAttempt < maxAttempts) {
-                blob = storage.get(BlobId.of(bucketName, objectName));
-                if (blob != null) {
-                    blob.downloadTo(Paths.get(destination));
-                }
-                currentAttempt++;
-            }
-        }
-        System.out.println(
-                blob+
-                "Downloaded object "
-                        + objectName
-                        + " from bucket name "
-                        + bucketName
-                        + " to "
-                        + destination);
+        return blob;
     }
 }
 
