@@ -21,18 +21,22 @@ import java.util.UUID;
 
 
 import com.google.cloud.storage.Blob;
-import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import io.github.cdimascio.dotenv.Dotenv;
+
 
 
 @Service
 public class DocService {
+
+    Dotenv dotenv = Dotenv.configure().load();
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
-    private final String bucketName = System.getenv("MY_BUCKET_NAME");
-    private final String projectId = System.getenv("MY_PROJECTID");
+
+    private final String bucketName = dotenv.get("MY_BUCKET_NAME");
+    private final String projectId = dotenv.get("MY_PROJECTID");
 
     FirestoreOptions firestoreOptions =
             FirestoreOptions.getDefaultInstance().toBuilder()
@@ -42,10 +46,8 @@ public class DocService {
     Firestore db = firestoreOptions.getService();
 
 
-
     public DocService() throws IOException {
     }
-
 
     public boolean uploadFile(MultipartFile file, String fileName) {
         UUID fileId = UUID.randomUUID();
@@ -78,20 +80,19 @@ public class DocService {
         DocumentReference docRef = db.collection("cartellefile_smartdoc").document(folderName);
         ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
-        Folder folder = null;
+
         if (document.exists()) {
             // convert document to POJO
-            folder = document.toObject(Folder.class);
+           return document.toObject(Folder.class);
         } else {
             System.out.println("No such document!");
+            return  null;
         }
-        return folder;
     }
 
     public Blob downloadObject(String objectName) {
         Storage storage = StorageOptions.newBuilder().setProjectId(projectId).build().getService();
-        Blob blob = storage.get(BlobId.of(bucketName, objectName));
-        return blob;
+        return storage.get(BlobId.of(bucketName, objectName));
     }
 }
 
